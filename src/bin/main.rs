@@ -1,9 +1,4 @@
-// simple web server example. in less than 40 lines.
-// responds to one request with content
-// all other requests result in 404
-// runs in a single thread
-
-use hello::ThreadPool;
+use server::ThreadPool;
 use std::fs;
 use std::io::prelude::*;
 use std::net::TcpListener;
@@ -18,12 +13,12 @@ fn main() {
     for stream in listener.incoming() {
         let stream = stream.unwrap();
 
-        pool::execute(|| {
+        pool.execute(|| {
             handle_connection(stream);
         });
     }
 
-    println!("Shutting down.")
+    println!("Shutting down.");
 }
 
 fn handle_connection(mut stream: TcpStream) {
@@ -38,7 +33,7 @@ fn handle_connection(mut stream: TcpStream) {
     } else if buffer.starts_with(sleep) {
         thread::sleep(Duration::from_secs(5));
         ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
-    }else {
+    } else {
         ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
     };
 
